@@ -1,5 +1,5 @@
 from initial_pop import create_initial_population
-from helpers import write_fitness_scores_to_csv, check_termination_condition, output_results
+from helpers import write_fitness_scores_to_csv
 
 import numpy as np
 import random
@@ -17,7 +17,9 @@ def genetic_algorithm(constants, word):
         fitness_scores = [evaluate_fitness(constants, individual, word) for individual in population]
 
         # Write fitness scores and get the highest fitness child
-        highest_fitness_child, highest_fitness_score = write_fitness_scores_to_csv(fitness_scores, population, 'fitness_scores.csv')
+        highest_fitness_child, highest_fitness_score = write_fitness_scores_to_csv(fitness_scores,
+                                                                                   population,
+                                                                                   'fitness_scores.csv')
 
         # Check termination condition
         if constants['MAX_FITNESS'] in fitness_scores:

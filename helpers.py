@@ -40,10 +40,6 @@ def write_fitness_scores_to_csv(fitness_scores, children, output_file):
     return max_fitness_child, max_fitness_score
 
 
-def check_termination_condition(max_fitness, fitness_scores):
-    return max_fitness in fitness_scores
-
-
 def output_results(highest_fitness_child, highest_fitness_score):
     print(f"Highest Fitness Child: {highest_fitness_child}")
     print(f"Highest Fitness Score: {highest_fitness_score}")

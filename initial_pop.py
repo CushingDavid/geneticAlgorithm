@@ -2,19 +2,7 @@ import random
 
 
 def create_initial_population(constants, word):
-    """
-    parent1 = [['w','d','r','o'],['o','r','w','d'],['r','o','d','w'],['d','w','o','r']]
-    parent2 = [['w','d','r','o'],['o','r','w','d'],['r','o','d','w'],['d','w','o','r']]
 
-    parent1 = [['w','','','o'],
-           ['o','r','','d'],
-           ['r','','',''],
-           ['','','o','r']]
-    parent2 = [['w','','r','o'],
-           ['','r','w','d'],
-           ['r','','d','w'],
-           ['d','w','o','r']]
-    """
     population = []
     for _ in range(constants['POPULATION_SIZE']):
         individual = [['-' for _ in range(constants['GRID_SIZE'])] for _ in range(constants['GRID_SIZE'])]
