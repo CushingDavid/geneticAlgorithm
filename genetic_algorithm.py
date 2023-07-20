@@ -25,6 +25,7 @@ def genetic_algorithm(constants, word):
         if constants['MAX_FITNESS'] in fitness_scores:
             break
 
+
         # Select best individuals as parents for the next generation
         selected_indices = np.argsort(fitness_scores)[-constants['SELECTED_POPULATION_SIZE']:]
         selected_parents = [population[i] for i in selected_indices]
@@ -83,8 +84,10 @@ def crossover(constants, parent1, parent2):
     for i in range(constants['GRID_SIZE']):
         for j in range(constants['GRID_SIZE']):
             if random.random() < constants['CROSSOVER_RATE']:
+                # Select gene from parent 1 if crossover occurs
                 child[i][j] = parent1[i][j]
             else:
+                # Select gene from parent 2 if crossover doesn't occur
                 child[i][j] = parent2[i][j]
 
     return child
@@ -97,6 +100,8 @@ def mutate(children, mutation_rate, word):
                 if child[i][j] == "-" or child[i][j].isupper():
                     if random.random() < mutation_rate:
                         valid_letters = [letter.upper() for letter in word]
+                        # Mutate the gene by selecting a random letter from the valid letters
                         child[i][j] = random.choice(valid_letters)
 
     return children
+

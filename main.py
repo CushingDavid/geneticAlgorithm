@@ -17,17 +17,22 @@ def admin_console():
 
         if choice == '1':
             constant_name = input("Enter the name of the constant to change: ")
+
+            # Check if the constant exists and is valid for modification
             if constant_name in constants and constant_name not in ['GRID_SIZE', 'SUBGRID_SIZE', 'MAX_FITNESS']:
                 constant_value = input("Enter the new value: ")
                 try:
                     constant_value = type(constants[constant_name])(constant_value)
+
                     if constant_name == 'SELECTED_POPULATION_SIZE':
+                        # Check if the new value is valid for SELECTED_POPULATION_SIZE
                         if constant_value > constants['POPULATION_SIZE']:
                             print("Selected Population Size should not be bigger than Population Size.")
                         else:
                             constants[constant_name] = constant_value
                             print("Constant changed successfully.")
                     elif constant_name in ['CROSSOVER_RATE', 'MUTATION_RATE']:
+                        # Check if the new value is within the valid range for CROSSOVER_RATE and MUTATION_RATE
                         if 0.1 <= constant_value <= 1:
                             constants[constant_name] = constant_value
                             print("Constant changed successfully.")
@@ -60,8 +65,12 @@ def start_menu():
 
         if choice == '1':
             word = word_select()
+
+            # Run the genetic algorithm and get the highest fitness child and score
             highest_fitness_child, highest_fitness_score = genetic_algorithm(constants, word)
             print("Genetic Algorithm completed.")
+
+            # Output the results
             output_results(highest_fitness_child, highest_fitness_score)
         elif choice == '2':
             admin_console()
@@ -78,13 +87,11 @@ constants = {
     'SUBGRID_SIZE': 2,
     'POPULATION_SIZE': 1000,
     'SELECTED_POPULATION_SIZE': 500,
-    'CROSSOVER_RATE': 0.5,
-    'MUTATION_RATE': 0.8,
-    'MAX_GENERATIONS': 1000,
+    'CROSSOVER_RATE': 0.8,
+    'MUTATION_RATE': 0.5,
+    'MAX_GENERATIONS': 800,
     'MAX_FITNESS': 24
 }
 
 # Start Menu
 start_menu()
-
-
