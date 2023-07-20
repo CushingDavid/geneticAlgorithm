@@ -19,7 +19,7 @@ def genetic_algorithm(constants, word):
         # Write fitness scores and get the highest fitness child
         highest_fitness_child, highest_fitness_score = write_fitness_scores_to_csv(fitness_scores,
                                                                                    population,
-                                                                                    'fitness_scores.csv')
+                                                                                   'fitness_scores.csv')
 
         # Check termination condition
         if constants['MAX_FITNESS'] in fitness_scores:
@@ -46,19 +46,23 @@ def genetic_algorithm(constants, word):
     return highest_fitness_child, highest_fitness_score
 
 
-def evaluate_fitness(constants, grid, word):
+def evaluate_fitness(constants, grid):
     fitness = 0
 
     # Check rows
     for row in grid:
-        if all(cell in word for cell in row):
+        if len(row) == len(set(row)) and '-' not in row:
             fitness += 1
+        else:
+            fitness -= 1
 
     # Check columns
     for j in range(constants['GRID_SIZE']):
         column = [grid[i][j] for i in range(constants['GRID_SIZE'])]
-        if all(cell in word for cell in column):
+        if len(column) == len(set(column)) and '-' not in column:
             fitness += 1
+        else:
+            fitness -= 1
 
     # Check subgroups
     for i in range(0, constants['GRID_SIZE'], constants['SUBGRID_SIZE']):
@@ -67,12 +71,14 @@ def evaluate_fitness(constants, grid, word):
             for x in range(i, i + constants['SUBGRID_SIZE']):
                 for y in range(j, j + constants['SUBGRID_SIZE']):
                     letter = grid[x][y]
-                    if letter in subgrid_letters:
-                        fitness -= 2  # Decrease fitness if a letter is repeated in the subgrid
-                    subgrid_letters.append(letter.upper())
+                    if letter != '-':
+                        subgrid_letters.append(letter.lower())
 
-            if len(set(subgrid_letters)) == constants['SUBGRID_SIZE'] * constants['SUBGRID_SIZE']:
-                fitness += 4  # Add 4 to fitness if subgrid_letters has 4 unique elements
+            if len(set(subgrid_letters)) == constants['SUBGRID_SIZE'] * constants['SUBGRID_SIZE'] \
+                    and '-' not in subgrid_letters:
+                fitness += 4
+            else:
+                fitness -= 4
 
     return fitness
 
@@ -103,4 +109,3 @@ def mutate(children, mutation_rate, word):
                         child[i][j] = random.choice(valid_letters)
 
     return children
-
