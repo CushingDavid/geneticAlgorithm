@@ -52,14 +52,35 @@ def admin_console():
             print("Invalid choice. Please try again.")
 
 
+def explain_constants():
+    print("\nExplanation of Constants:")
+    print(f"\nGRID_SIZE ({constants['GRID_SIZE']}): The size of the grid in the puzzle (e.g., 4 for a 4x4 grid).")
+    print(f"\nSUBGRID_SIZE ({constants['SUBGRID_SIZE']}): The size of the sub-grid in the puzzle (e.g., 2 for a 2x2 sub-grid).")
+    print(f"\nUSER_INITIAL_GRID ({constants['USER_INITIAL_GRID']}): Determines if the user will provide the initial grid or not.")
+    print(f"\nPOPULATION_SIZE ({constants['POPULATION_SIZE']}): The size of the population used in the genetic algorithm.")
+    print(f"\nSELECTED_POPULATION_SIZE ({constants['SELECTED_POPULATION_SIZE']}): The number of individuals selected for the next generation in the genetic algorithm.")
+    print(f"\nCROSSOVER_RATE ({constants['CROSSOVER_RATE']}): The probability of crossover happening between two individuals in the genetic algorithm.")
+    print(f"\nMUTATION_RATE ({constants['MUTATION_RATE']}): The probability of mutation happening in an individual in the genetic algorithm.")
+    print(f"\nELITISM_RATE ({constants['ELITISM_RATE']}): The percentage of the best individuals to be passed directly to the next generation in the genetic algorithm.")
+    print(f"\nMAX_GENERATIONS ({constants['MAX_GENERATIONS']}): The maximum number of generations that the genetic algorithm will run for.")
+    print(f"\nMAX_FITNESS ({constants['MAX_FITNESS']}): The maximum fitness score an individual can get.")
+
+
 def start_menu():
     print("Welcome to the Genetic Algorithm!")
+    print("\nThis program uses a genetic algorithm to solve a unique puzzle based on a user-selected word.")
+    print(
+        "The genetic algorithm is a search heuristic that is inspired by Charles Darwin's theory of natural evolution.")
+    print("This algorithm reflects the process of natural selection where the fittest individuals "
+          "are selected for reproduction.")
+    print("The goal of the program is to evolve a population to get a grid with maximum fitness.\n")
 
     while True:
         print("\nStart Menu:")
         print("1. Run Genetic Algorithm")
         print("2. Admin Console")
-        print("3. Exit")
+        print("3. Explanation of Constants")
+        print("4. Exit")
 
         choice = input("Enter your choice: ")
 
@@ -67,16 +88,18 @@ def start_menu():
             word = word_select()
 
             # Run the genetic algorithm and get the highest fitness child and score
-            highest_fitness_child, highest_fitness_score, row_score, col_score, subgroup_score = genetic_algorithm(
+            highest_fitness_child, highest_fitness_score = genetic_algorithm(
                 constants, word)
 
             print("Genetic Algorithm completed.")
             # Output Results
-            output_results(highest_fitness_child, highest_fitness_score, row_score, col_score, subgroup_score)
+            output_results(highest_fitness_child, highest_fitness_score)
 
         elif choice == '2':
             admin_console()
         elif choice == '3':
+            explain_constants()
+        elif choice == '4':
             print("Exiting Program.")
             break
         else:

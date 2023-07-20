@@ -8,7 +8,7 @@ import random
 def genetic_algorithm(constants, word):
     # Create initial population
     population = create_initial_population(constants, word)
-    print("Populations created\n--------\n")
+    print("Populations created\nGenetic Algorithm starting...\n--------\n")
 
     highest_fitness_child = None
     highest_fitness_score = float('-inf')
@@ -23,19 +23,13 @@ def genetic_algorithm(constants, word):
         # Evaluate fitness for each individual in the population
         fitness_scores = []
         for individual in population:
-            fitness_score, row_score, col_score, subgroup_score = evaluate_fitness(constants, individual)
+            fitness_score = evaluate_fitness(constants, individual)
             fitness_scores.append(fitness_score)
-            row_fitness.append(row_score)
-            col_fitness.append(col_score)
-            subgroup_fitness.append(subgroup_score)
 
         # Write fitness scores and get the highest fitness child
         highest_fitness_child, highest_fitness_score = write_fitness_scores_to_csv(fitness_scores,
                                                                                    population,
-                                                                                   'fitness_scores.csv',
-                                                                                   row_fitness,
-                                                                                   col_fitness,
-                                                                                   subgroup_fitness)
+                                                                                   'fitness_scores.csv',)
 
         # Check termination condition
         if constants['MAX_FITNESS'] in fitness_scores:
@@ -71,21 +65,18 @@ def genetic_algorithm(constants, word):
             if progress == threshold:
                 print(f"Progress: {progress:.1f}% reached.")
 
-    return highest_fitness_child, highest_fitness_score, row_score, col_score, subgroup_score
+    return highest_fitness_child, highest_fitness_score
 
 
 def evaluate_fitness(constants, grid):
-    row_score = 0
-    col_score = 0
-    subgroup_score = 0
-
+    fitness = 0
     # Check rows
     for row in grid:
-        row_words = [cell.lower() if cell != '-' else '-' for cell in row]
-        if '-' in row_words or len(row_words) != len(set(row_words)):
-            row_score -= 1
+        row_letters = [cell.lower() if cell != '-' else '-' for cell in row]
+        if '-' in row_letters or len(row_letters) != len(set(row_letters)):
+            fitness -= 1
         else:
-            row_score += 1
+            fitness += 1
         # print(f"row: {row_words} | {row_score}")
 
     # Check columns
@@ -93,9 +84,9 @@ def evaluate_fitness(constants, grid):
         column = [grid[i][j] for i in range(constants['GRID_SIZE'])]
         column_words = [cell.lower() if cell != '-' else '-' for cell in column]
         if '-' in column_words or len(column_words) != len(set(column_words)):
-            col_score -= 1
+            fitness -= 1
         else:
-            col_score += 1
+            fitness += 1
         # print(f"col: {column_words} | {col_score}")
 
     # Check subgroups
@@ -110,13 +101,13 @@ def evaluate_fitness(constants, grid):
 
             if len(set(subgrid_letters)) == constants['SUBGRID_SIZE'] * constants['SUBGRID_SIZE'] \
                     and '-' not in subgrid_letters:
-                subgroup_score += 4
+                fitness += 4
             else:
-                subgroup_score -= 4
+                fitness -= 4
     # print(f"-----\n")
-    fitness = row_score + col_score + subgroup_score
 
-    return fitness, row_score, col_score, subgroup_score
+
+    return fitness
 
 
 def crossover(constants, parent1, parent2):

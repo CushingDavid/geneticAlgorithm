@@ -51,26 +51,22 @@ def find_highest_fitness_child(fitness_scores, population):
     return max_fitness_child, max_fitness_score
 
 
-def write_fitness_scores_to_csv(fitness_scores, population, output_file, row_fitness, col_fitness, subgroup_fitness):
+def write_fitness_scores_to_csv(fitness_scores, population, output_file):
     max_fitness_child, max_fitness_score = find_highest_fitness_child(fitness_scores, population)
 
     with open(output_file, 'w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(['Child', 'Fitness Score', 'Row Fitness', 'Column Fitness', 'Subgroup Fitness'])
+        writer.writerow(['Child', 'Fitness Score'])
         for i in range(len(fitness_scores)):
-            writer.writerow([str(population[i]), str(fitness_scores[i]), str(row_fitness[i]), str(col_fitness[i]),
-                             str(subgroup_fitness[i])])
+            writer.writerow([str(population[i]), str(fitness_scores[i])])
 
     return max_fitness_child, max_fitness_score
 
 
-def output_results(highest_fitness_child, highest_fitness_score, row_score, col_score, subgroup_score):
+def output_results(highest_fitness_child, highest_fitness_score):
     # Print the highest fitness child and score
     print(f"Highest Fitness Child: {highest_fitness_child}")
     print(f"Highest Fitness Score: {highest_fitness_score}\n")
-    print(f"Row Score: {row_score}")
-    print(f"Column Score: {col_score}")
-    print(f"Subgroup Score: {subgroup_score}")
     print("Grid:")
 
     # Print the grid of the highest fitness child
