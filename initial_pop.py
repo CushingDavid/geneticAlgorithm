@@ -13,7 +13,7 @@ def create_initial_population(constants, word):
         if constants['USER_INITIAL_GRID']:
             # If we're generating the first two individuals, use the initial grid
             if len(population) < 2:
-                individual = set_initial_grid(constants, word)
+                individual = set_initial_grid(constants, word, len(population)+1)
             else:  # Otherwise, copy the initial grid
                 individual = copy.deepcopy(population[0])
         else:

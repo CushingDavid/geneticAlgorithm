@@ -8,6 +8,7 @@ import random
 def genetic_algorithm(constants, word):
     # Create initial population
     population = create_initial_population(constants, word)
+    print("Populations created\n--------\n")
 
     highest_fitness_child = None
     highest_fitness_score = float('-inf')

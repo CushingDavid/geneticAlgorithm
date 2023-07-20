@@ -13,9 +13,11 @@ def word_select():
             print("Invalid input. Please enter a 4-letter word consisting of letters only.")
 
 
-def set_initial_grid(constants, word):
+def set_initial_grid(constants, word, parent_num):
     # Create an initial grid filled with '-'
     grid = [['-' for _ in range(constants['GRID_SIZE'])] for _ in range(constants['GRID_SIZE'])]
+
+    print(f"Please enter the initial grid for Parent {parent_num}.\n")
 
     # Iterate over each row and column
     for row in range(constants['GRID_SIZE']):
@@ -23,7 +25,7 @@ def set_initial_grid(constants, word):
             valid_letter = False
             while not valid_letter:
                 # Ask the user to enter a letter for the current position
-                letter = input(f"Enter a letter for position ({row}, {col}): ").lower()
+                letter = input(f"Enter a letter for position ({row}, {col}) in Parent {parent_num}: ").lower()
 
                 # Check if the input is a valid single letter from the word or '-'
                 if len(letter) == 1 and (letter == '-' or letter in word):
@@ -31,6 +33,13 @@ def set_initial_grid(constants, word):
                     valid_letter = True
                 else:
                     print("Invalid input. Please enter a single letter from the word or '-' to leave the cell empty.")
+
+        # Print the current state of the grid for better visibility
+
+        for r in grid:
+            print('| ' + ' '.join(r) + ' |')
+
+    print(f"Grid for Parent {parent_num} has been set.\n")
 
     return grid
 
