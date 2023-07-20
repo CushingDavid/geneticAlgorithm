@@ -19,12 +19,11 @@ def genetic_algorithm(constants, word):
         # Write fitness scores and get the highest fitness child
         highest_fitness_child, highest_fitness_score = write_fitness_scores_to_csv(fitness_scores,
                                                                                    population,
-                                                                                   'fitness_scores.csv')
+                                                                                    'fitness_scores.csv')
 
         # Check termination condition
         if constants['MAX_FITNESS'] in fitness_scores:
             break
-
 
         # Select best individuals as parents for the next generation
         selected_indices = np.argsort(fitness_scores)[-constants['SELECTED_POPULATION_SIZE']:]
