@@ -25,9 +25,14 @@ def genetic_algorithm(constants, word):
         if constants['MAX_FITNESS'] in fitness_scores:
             break
 
-        # Select best individuals as parents for the next generation
-        selected_indices = np.argsort(fitness_scores)[-constants['SELECTED_POPULATION_SIZE']:]
-        selected_parents = [population[i] for i in selected_indices]
+        # Apply elitism by preserving a certain percentage of the fittest individuals
+        num_elites = int(constants['ELITISM_RATE'] * constants['POPULATION_SIZE'])
+        elite_indices = np.argsort(fitness_scores)[-num_elites:]
+        elites = [population[i] for i in elite_indices]
+
+        # Select best individuals as parents for the next generation (excluding elites)
+        non_elite_indices = np.argsort(fitness_scores)[:-num_elites]
+        selected_parents = [population[i] for i in non_elite_indices]
 
         # Create empty list for children
         children = []
@@ -40,13 +45,13 @@ def genetic_algorithm(constants, word):
         # Mutate the children
         mutated_children = mutate(children, constants['MUTATION_RATE'], word)
 
-        # Replace the population with mutated children
-        population = mutated_children
+        # Replace the population with mutated children and elites
+        population = mutated_children + elites
 
     return highest_fitness_child, highest_fitness_score
 
 
-def evaluate_fitness(constants, grid):
+def evaluate_fitness(constants, grid, word):
     fitness = 0
 
     # Check rows
@@ -109,3 +114,4 @@ def mutate(children, mutation_rate, word):
                         child[i][j] = random.choice(valid_letters)
 
     return children
+
