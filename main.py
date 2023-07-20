@@ -67,11 +67,12 @@ def start_menu():
             word = word_select()
 
             # Run the genetic algorithm and get the highest fitness child and score
-            highest_fitness_child, highest_fitness_score = genetic_algorithm(constants, word)
-            print("Genetic Algorithm completed.")
+            highest_fitness_child, highest_fitness_score, row_score, col_score, subgroup_score = genetic_algorithm(
+                constants, word)
 
-            # Output the results
-            output_results(highest_fitness_child, highest_fitness_score)
+            print("Genetic Algorithm completed.")
+            # Output Results
+            output_results(highest_fitness_child, highest_fitness_score, row_score, col_score, subgroup_score)
         elif choice == '2':
             admin_console()
         elif choice == '3':
