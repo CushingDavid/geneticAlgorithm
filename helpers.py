@@ -17,17 +17,18 @@ def set_initial_grid(constants, word):
     # Create an initial grid filled with '-'
     grid = [['-' for _ in range(constants['GRID_SIZE'])] for _ in range(constants['GRID_SIZE'])]
 
-    # Prompt the user to enter letters for each position in the grid
-    for i in range(constants['GRID_SIZE']):
-        for j in range(constants['GRID_SIZE']):
-            while True:
+    # Iterate over each row and column
+    for row in range(constants['GRID_SIZE']):
+        for col in range(constants['GRID_SIZE']):
+            valid_letter = False
+            while not valid_letter:
                 # Ask the user to enter a letter for the current position
-                letter = input(f"Enter a letter for position ({i}, {j}): ").lower()
+                letter = input(f"Enter a letter for position ({row}, {col}): ").lower()
 
                 # Check if the input is a valid single letter from the word or '-'
                 if len(letter) == 1 and (letter == '-' or letter in word):
-                    grid[i][j] = letter  # Assign the letter to the current position in the grid
-                    break
+                    grid[row][col] = letter  # Assign the letter to the current position in the grid
+                    valid_letter = True
                 else:
                     print("Invalid input. Please enter a single letter from the word or '-' to leave the cell empty.")
 
@@ -48,7 +49,8 @@ def write_fitness_scores_to_csv(fitness_scores, population, output_file, row_fit
         writer = csv.writer(file)
         writer.writerow(['Child', 'Fitness Score', 'Row Fitness', 'Column Fitness', 'Subgroup Fitness'])
         for i in range(len(fitness_scores)):
-            writer.writerow([str(population[i]), str(fitness_scores[i]), str(row_fitness[i]), str(col_fitness[i]), str(subgroup_fitness[i])])
+            writer.writerow([str(population[i]), str(fitness_scores[i]), str(row_fitness[i]), str(col_fitness[i]),
+                             str(subgroup_fitness[i])])
 
     return max_fitness_child, max_fitness_score
 

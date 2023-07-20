@@ -12,6 +12,9 @@ def genetic_algorithm(constants, word):
     highest_fitness_child = None
     highest_fitness_score = float('-inf')
 
+    max_generations = constants['MAX_GENERATIONS']
+    generation_thresholds = [25, 50, 75]  # Percentage thresholds
+
     for generation in range(constants['MAX_GENERATIONS']):
         row_fitness = []
         col_fitness = []
@@ -60,11 +63,17 @@ def genetic_algorithm(constants, word):
         # Replace the population with mutated children and elites
         population = mutated_children + elites
 
+        progress = (generation + 1) / max_generations * 100
+
+        # Check and print progress at specific percentage thresholds
+        for threshold in generation_thresholds:
+            if progress == threshold:
+                print(f"Progress: {progress:.1f}% reached.")
+
     return highest_fitness_child, highest_fitness_score, row_score, col_score, subgroup_score
 
 
 def evaluate_fitness(constants, grid):
-    fitness = 0
     row_score = 0
     col_score = 0
     subgroup_score = 0
@@ -72,19 +81,21 @@ def evaluate_fitness(constants, grid):
     # Check rows
     for row in grid:
         row_words = [cell.lower() if cell != '-' else '-' for cell in row]
-        if len(row_words) == len(set(row_words)) and '-' not in row_words:
-            row_score += 1
-        else:
+        if '-' in row_words or len(row_words) != len(set(row_words)):
             row_score -= 1
+        else:
+            row_score += 1
+        # print(f"row: {row_words} | {row_score}")
 
     # Check columns
     for j in range(constants['GRID_SIZE']):
         column = [grid[i][j] for i in range(constants['GRID_SIZE'])]
         column_words = [cell.lower() if cell != '-' else '-' for cell in column]
-        if len(column_words) == len(set(column_words)) and '-' not in column_words:
-            col_score += 1
-        else:
+        if '-' in column_words or len(column_words) != len(set(column_words)):
             col_score -= 1
+        else:
+            col_score += 1
+        # print(f"col: {column_words} | {col_score}")
 
     # Check subgroups
     for i in range(0, constants['GRID_SIZE'], constants['SUBGRID_SIZE']):
@@ -101,7 +112,7 @@ def evaluate_fitness(constants, grid):
                 subgroup_score += 4
             else:
                 subgroup_score -= 4
-
+    # print(f"-----\n")
     fitness = row_score + col_score + subgroup_score
 
     return fitness, row_score, col_score, subgroup_score
@@ -112,12 +123,16 @@ def crossover(constants, parent1, parent2):
 
     for i in range(constants['GRID_SIZE']):
         for j in range(constants['GRID_SIZE']):
-            if random.random() < constants['CROSSOVER_RATE']:
-                # Select gene from parent 1 if crossover occurs
+            # Skip crossover if the letter from parent1 is lowercase
+            if parent1[i][j].islower():
                 child[i][j] = parent1[i][j]
             else:
-                # Select gene from parent 2 if crossover doesn't occur
-                child[i][j] = parent2[i][j]
+                if random.random() < constants['CROSSOVER_RATE']:
+                    # Select gene from parent 1 if crossover occurs
+                    child[i][j] = parent1[i][j]
+                else:
+                    # Select gene from parent 2 if crossover doesn't occur
+                    child[i][j] = parent2[i][j]
 
     return child
 
