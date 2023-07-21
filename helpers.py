@@ -48,6 +48,7 @@ def find_highest_fitness_child(fitness_scores, population):
     max_fitness_index = max(range(len(fitness_scores)), key=lambda i: fitness_scores[i])
     max_fitness_child = population[max_fitness_index]
     max_fitness_score = fitness_scores[max_fitness_index]
+
     return max_fitness_child, max_fitness_score
 
 

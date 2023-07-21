@@ -108,7 +108,6 @@ def evaluate_fitness(constants, grid):
                 fitness += 4
             else:
                 fitness -= 4
-    # print(f"-----\n")
 
     return fitness
 

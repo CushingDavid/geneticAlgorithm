@@ -20,6 +20,7 @@ def admin_console():
 
             # Check if the constant name is 'USER_INITIAL_GRID'
             if constant_name == 'USER_INITIAL_GRID':
+                # Toggle
                 constants[constant_name] = not constants[constant_name]
                 print(f"Constant {constants[constant_name]} toggled successfully.")
             # Check if the constant exists and is valid for modification
