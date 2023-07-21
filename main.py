@@ -129,16 +129,17 @@ def start_menu():
 constants = {
     'GRID_SIZE': 4,
     'SUBGRID_SIZE': 2,
-    'USER_INITIAL_GRID': True,
+    'USER_INITIAL_GRID': False,
     'POPULATION_SIZE': 1000,
     'SELECTED_POPULATION_SIZE': 500,
     'CROSSOVER_RATE': 0.8,
     'MUTATION_RATE': 0.3,
     'ELITISM_ENABLED': False,
     'ELITISM_RATE': 0.1,
-    'MAX_GENERATIONS': 1000,
+    'MAX_GENERATIONS': 10000,
     'MAX_FITNESS': 24
 }
 
-# Start Menu
-start_menu()
+
+if __name__ == '__main__':
+    start_menu()
