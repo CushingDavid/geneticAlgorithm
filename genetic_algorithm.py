@@ -8,13 +8,13 @@ import random
 def genetic_algorithm(constants, word):
     # Create initial population
     population = create_initial_population(constants, word)
-    print("Populations created\nGenetic Algorithm starting...\n--------\n")
+    print("\nPopulations created\nGenetic Algorithm starting...\n")
 
     highest_fitness_child = None
     highest_fitness_score = float('-inf')
 
     max_generations = constants['MAX_GENERATIONS']
-    generation_thresholds = [25, 50, 75]  # Percentage thresholds
+    generation_thresholds = [10, 20, 30, 40, 50, 60, 70, 80, 90]  # Percentage thresholds
 
     for generation in range(constants['MAX_GENERATIONS']):
         # Evaluate fitness for each individual in the population
