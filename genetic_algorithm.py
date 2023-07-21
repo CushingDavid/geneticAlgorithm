@@ -1,3 +1,5 @@
+import multiprocessing
+
 from initial_pop import create_initial_population
 from helpers import write_fitness_scores_to_csv
 
@@ -16,58 +18,56 @@ def genetic_algorithm(constants, word):
     max_generations = constants['MAX_GENERATIONS']
     generation_thresholds = [10, 20, 30, 40, 50, 60, 70, 80, 90]  # Percentage thresholds
 
-    for generation in range(constants['MAX_GENERATIONS']):
-        # Evaluate fitness for each individual in the population
-        fitness_scores = []
-        for individual in population:
-            fitness_score = evaluate_fitness(constants, individual)
-            fitness_scores.append(fitness_score)
+    with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
+        for generation in range(constants['MAX_GENERATIONS']):
+            # Evaluate fitness for each individual in the population
+            fitness_scores = pool.starmap(evaluate_fitness, [(constants, individual) for individual in population])
 
-        # Write fitness scores and get the highest fitness child
-        highest_fitness_child, highest_fitness_score = write_fitness_scores_to_csv(fitness_scores,
-                                                                                   population,
-                                                                                   'fitness_scores.csv',)
+            # Write fitness scores and get the highest fitness child
+            highest_fitness_child, highest_fitness_score = write_fitness_scores_to_csv(fitness_scores,
+                                                                                       population,
+                                                                                       'fitness_scores.csv',)
 
-        # Check termination condition
-        if constants['MAX_FITNESS'] in fitness_scores:
-            break
+            # Check termination condition
+            if constants['MAX_FITNESS'] in fitness_scores:
+                break
 
-        if constants['ELITISM_ENABLED']:
-            # Apply elitism by preserving a certain percentage of the fittest individuals
-            num_elites = int(constants['ELITISM_RATE'] * constants['POPULATION_SIZE'])
-            elite_indices = np.argsort(fitness_scores)[-num_elites:]
-            elites = [population[i] for i in elite_indices]
+            if constants['ELITISM_ENABLED']:
+                # Apply elitism by preserving a certain percentage of the fittest individuals
+                num_elites = int(constants['ELITISM_RATE'] * constants['POPULATION_SIZE'])
+                elite_indices = np.argsort(fitness_scores)[-num_elites:]
+                elites = [population[i] for i in elite_indices]
 
-            # Select best individuals as parents for the next generation (excluding elites)
-            non_elite_indices = np.argsort(fitness_scores)[:-num_elites]
-        else:
-            # If elitism is not enabled, all individuals can be parents
-            non_elite_indices = np.argsort(fitness_scores)
-            elites = []
+                # Select best individuals as parents for the next generation (excluding elites)
+                non_elite_indices = np.argsort(fitness_scores)[:-num_elites]
+            else:
+                # If elitism is not enabled, all individuals can be parents
+                non_elite_indices = np.argsort(fitness_scores)
+                elites = []
 
-        # Select parents for the next generation
-        selected_parents = [population[i] for i in non_elite_indices]
+            # Select parents for the next generation
+            selected_parents = [population[i] for i in non_elite_indices]
 
-        # Create empty list for children
-        children = []
+            # Create empty list for children
+            children = []
 
-        # Generate offspring through crossover
-        for _ in range(constants['SELECTED_POPULATION_SIZE']):
-            child = crossover(constants, selected_parents[0], selected_parents[1])
-            children.append(child)
+            # Generate offspring through crossover
+            for _ in range(constants['SELECTED_POPULATION_SIZE']):
+                child = crossover(constants, selected_parents[0], selected_parents[1])
+                children.append(child)
 
-        # Mutate the children
-        mutated_children = mutate(children, constants['MUTATION_RATE'], word)
+            # Mutate the children
+            mutated_children = mutate(children, constants['MUTATION_RATE'], word)
 
-        # Replace the population with mutated children and elites
-        population = mutated_children + elites
+            # Replace the population with mutated children and elites
+            population = mutated_children + elites
 
-        progress = (generation + 1) / max_generations * 100
+            progress = (generation + 1) / max_generations * 100
 
-        # Check and print progress at specific percentage thresholds
-        for threshold in generation_thresholds:
-            if progress == threshold:
-                print(f"Progress: {progress:.0f}% reached.")
+            # Check and print progress at specific percentage thresholds
+            for threshold in generation_thresholds:
+                if progress == threshold:
+                    print(f"Progress: {progress:.0f}% reached.")
 
     return highest_fitness_child, highest_fitness_score
 
