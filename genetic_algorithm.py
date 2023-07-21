@@ -8,9 +8,13 @@ import random
 def genetic_algorithm(constants, word):
     # Create initial population
     population = create_initial_population(constants, word)
+    print("Populations created\nGenetic Algorithm starting...\n--------\n")
 
     highest_fitness_child = None
     highest_fitness_score = float('-inf')
+
+    max_generations = constants['MAX_GENERATIONS']
+    generation_thresholds = [25, 50, 75]  # Percentage thresholds
 
     for generation in range(constants['MAX_GENERATIONS']):
         row_fitness = []
@@ -19,27 +23,37 @@ def genetic_algorithm(constants, word):
         # Evaluate fitness for each individual in the population
         fitness_scores = []
         for individual in population:
-            fitness_score, row_score, col_score, subgroup_score = evaluate_fitness(constants, individual)
+
+            fitness_score = evaluate_fitness(constants, individual)
             fitness_scores.append(fitness_score)
-            row_fitness.append(row_score)
-            col_fitness.append(col_score)
-            subgroup_fitness.append(subgroup_score)
+
 
         # Write fitness scores and get the highest fitness child
         highest_fitness_child, highest_fitness_score = write_fitness_scores_to_csv(fitness_scores,
                                                                                    population,
-                                                                                   'fitness_scores.csv',
-                                                                                   row_fitness,
-                                                                                   col_fitness,
-                                                                                   subgroup_fitness)
+                                                                                   'fitness_scores.csv',)
+
+
 
         # Check termination condition
         if constants['MAX_FITNESS'] in fitness_scores:
             break
 
-        # Select best individuals as parents for the next generation
-        selected_indices = np.argsort(fitness_scores)[-constants['SELECTED_POPULATION_SIZE']:]
-        selected_parents = [population[i] for i in selected_indices]
+        if constants['ELITISM_ENABLED']:
+            # Apply elitism by preserving a certain percentage of the fittest individuals
+            num_elites = int(constants['ELITISM_RATE'] * constants['POPULATION_SIZE'])
+            elite_indices = np.argsort(fitness_scores)[-num_elites:]
+            elites = [population[i] for i in elite_indices]
+
+            # Select best individuals as parents for the next generation (excluding elites)
+            non_elite_indices = np.argsort(fitness_scores)[:-num_elites]
+        else:
+            # If elitism is not enabled, all individuals can be parents
+            non_elite_indices = np.argsort(fitness_scores)
+            elites = []
+
+        # Select parents for the next generation
+        selected_parents = [population[i] for i in non_elite_indices]
 
         # Create empty list for children
         children = []
@@ -52,33 +66,43 @@ def genetic_algorithm(constants, word):
         # Mutate the children
         mutated_children = mutate(children, constants['MUTATION_RATE'], word)
 
-        # Replace the population with mutated children
-        population = mutated_children
+        # Replace the population with mutated children and elites
+        population = mutated_children + elites
+
+        progress = (generation + 1) / max_generations * 100
+
+        # Check and print progress at specific percentage thresholds
+        for threshold in generation_thresholds:
+            if progress == threshold:
+                print(f"Progress: {progress:.0f}% reached.")
 
     return highest_fitness_child, highest_fitness_score, row_score, col_score, subgroup_score
 
 
 def evaluate_fitness(constants, grid):
-    row_score = 0
-    col_score = 0
-    subgroup_score = 0
 
+    fitness = 0
     # Check rows
     for row in grid:
-        row_words = [cell.lower() if cell != '-' else '-' for cell in row]
-        if len(row_words) == len(set(row_words)) and '-' not in row_words:
-            row_score += 1
+        row_letters = [cell.lower() if cell != '-' else '-' for cell in row]
+        if '-' in row_letters or len(row_letters) != len(set(row_letters)):
+            fitness -= 1
         else:
-            row_score -= 1
+            fitness += 1
+        # print(f"row: {row_words} | {row_score}")
+
 
     # Check columns
     for j in range(constants['GRID_SIZE']):
         column = [grid[i][j] for i in range(constants['GRID_SIZE'])]
         column_words = [cell.lower() if cell != '-' else '-' for cell in column]
-        if len(column_words) == len(set(column_words)) and '-' not in column_words:
-            col_score += 1
+
+        if '-' in column_words or len(column_words) != len(set(column_words)):
+            fitness -= 1
         else:
-            col_score -= 1
+            fitness += 1
+        # print(f"col: {column_words} | {col_score}")
+
 
     # Check subgroups
     for i in range(0, constants['GRID_SIZE'], constants['SUBGRID_SIZE']):
@@ -94,7 +118,10 @@ def evaluate_fitness(constants, grid):
                     and '-' not in subgrid_letters:
                 subgroup_score += 4
             else:
-                subgroup_score -= 4
+
+                fitness -= 4
+    # print(f"-----\n")
+
 
     fitness = row_score + col_score + subgroup_score
 
@@ -106,12 +133,16 @@ def crossover(constants, parent1, parent2):
 
     for i in range(constants['GRID_SIZE']):
         for j in range(constants['GRID_SIZE']):
-            if random.random() < constants['CROSSOVER_RATE']:
-                # Select gene from parent 1 if crossover occurs
+            # Skip crossover if the letter from parent1 is lowercase
+            if parent1[i][j].islower():
                 child[i][j] = parent1[i][j]
             else:
-                # Select gene from parent 2 if crossover doesn't occur
-                child[i][j] = parent2[i][j]
+                if random.random() < constants['CROSSOVER_RATE']:
+                    # Select gene from parent 1 if crossover occurs
+                    child[i][j] = parent1[i][j]
+                else:
+                    # Select gene from parent 2 if crossover doesn't occur
+                    child[i][j] = parent2[i][j]
 
     return child
 
