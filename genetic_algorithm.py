@@ -17,16 +17,23 @@ def genetic_algorithm(constants, word):
     generation_thresholds = [25, 50, 75]  # Percentage thresholds
 
     for generation in range(constants['MAX_GENERATIONS']):
+        row_fitness = []
+        col_fitness = []
+        subgroup_fitness = []
         # Evaluate fitness for each individual in the population
         fitness_scores = []
         for individual in population:
+
             fitness_score = evaluate_fitness(constants, individual)
             fitness_scores.append(fitness_score)
+
 
         # Write fitness scores and get the highest fitness child
         highest_fitness_child, highest_fitness_score = write_fitness_scores_to_csv(fitness_scores,
                                                                                    population,
                                                                                    'fitness_scores.csv',)
+
+
 
         # Check termination condition
         if constants['MAX_FITNESS'] in fitness_scores:
@@ -69,10 +76,11 @@ def genetic_algorithm(constants, word):
             if progress == threshold:
                 print(f"Progress: {progress:.0f}% reached.")
 
-    return highest_fitness_child, highest_fitness_score
+    return highest_fitness_child, highest_fitness_score, row_score, col_score, subgroup_score
 
 
 def evaluate_fitness(constants, grid):
+
     fitness = 0
     # Check rows
     for row in grid:
@@ -83,15 +91,18 @@ def evaluate_fitness(constants, grid):
             fitness += 1
         # print(f"row: {row_words} | {row_score}")
 
+
     # Check columns
     for j in range(constants['GRID_SIZE']):
         column = [grid[i][j] for i in range(constants['GRID_SIZE'])]
         column_words = [cell.lower() if cell != '-' else '-' for cell in column]
+
         if '-' in column_words or len(column_words) != len(set(column_words)):
             fitness -= 1
         else:
             fitness += 1
         # print(f"col: {column_words} | {col_score}")
+
 
     # Check subgroups
     for i in range(0, constants['GRID_SIZE'], constants['SUBGRID_SIZE']):
@@ -105,12 +116,16 @@ def evaluate_fitness(constants, grid):
 
             if len(set(subgrid_letters)) == constants['SUBGRID_SIZE'] * constants['SUBGRID_SIZE'] \
                     and '-' not in subgrid_letters:
-                fitness += 4
+                subgroup_score += 4
             else:
+
                 fitness -= 4
     # print(f"-----\n")
 
-    return fitness
+
+    fitness = row_score + col_score + subgroup_score
+
+    return fitness, row_score, col_score, subgroup_score
 
 
 def crossover(constants, parent1, parent2):

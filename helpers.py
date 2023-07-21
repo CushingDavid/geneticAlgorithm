@@ -44,6 +44,7 @@ def set_initial_grid(constants, word, parent_num):
     return grid
 
 
+
 def find_highest_fitness_child(fitness_scores, population):
     max_fitness_index = max(range(len(fitness_scores)), key=lambda i: fitness_scores[i])
     max_fitness_child = population[max_fitness_index]
@@ -52,18 +53,15 @@ def find_highest_fitness_child(fitness_scores, population):
 
 
 def write_fitness_scores_to_csv(fitness_scores, population, output_file):
-    max_fitness_child, max_fitness_score = find_highest_fitness_child(fitness_scores, population)
 
-    with open(output_file, 'w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['Child', 'Fitness Score'])
-        for i in range(len(fitness_scores)):
+def write_fitness_scores_to_csv(fitness_scores, population, output_file, row_fitness, col_fitness, subgroup_fitness):
             writer.writerow([str(population[i]), str(fitness_scores[i])])
+
 
     return max_fitness_child, max_fitness_score
 
 
-def output_results(highest_fitness_child, highest_fitness_score):
+def output_results(highest_fitness_child, highest_fitness_score, row_score, col_score, subgroup_score):
     # Print the highest fitness child and score
     print("Lowercase letters show initial values\nUppercase letters so mutated values\n")
     print(f"Highest Fitness Child: {highest_fitness_child}")
