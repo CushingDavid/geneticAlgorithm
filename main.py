@@ -59,15 +59,25 @@ def admin_console():
 
 def explain_constants():
     print("\nExplanation of Constants:")
-    print(f"\nGRID_SIZE ({constants['GRID_SIZE']}): The size of the grid in the puzzle (e.g., 4 for a 4x4 grid).")
-    print(f"\nSUBGRID_SIZE ({constants['SUBGRID_SIZE']}): The size of the sub-grid in the puzzle (e.g., 2 for a 2x2 sub-grid).")
-    print(f"\nUSER_INITIAL_GRID ({constants['USER_INITIAL_GRID']}): Determines if the user will provide the initial grid or not.")
-    print(f"\nPOPULATION_SIZE ({constants['POPULATION_SIZE']}): The size of the population used in the genetic algorithm.")
-    print(f"\nSELECTED_POPULATION_SIZE ({constants['SELECTED_POPULATION_SIZE']}): The number of individuals selected for the next generation in the genetic algorithm.")
-    print(f"\nCROSSOVER_RATE ({constants['CROSSOVER_RATE']}): The probability of crossover happening between two individuals in the genetic algorithm.")
-    print(f"\nMUTATION_RATE ({constants['MUTATION_RATE']}): The probability of mutation happening in an individual in the genetic algorithm.")
-    print(f"\nELITISM_RATE ({constants['ELITISM_RATE']}): The percentage of the best individuals to be passed directly to the next generation in the genetic algorithm.")
-    print(f"\nMAX_GENERATIONS ({constants['MAX_GENERATIONS']}): The maximum number of generations that the genetic algorithm will run for.")
+    print(f"\nGRID_SIZE ({constants['GRID_SIZE']}):"
+          f" The size of the grid in the puzzle (e.g., 4 for a 4x4 grid).")
+    print(f"\nSUBGRID_SIZE ({constants['SUBGRID_SIZE']}):"
+          f" The size of the sub-grid in the puzzle (e.g., 2 for a 2x2 sub-grid).")
+    print(f"\nUSER_INITIAL_GRID ({constants['USER_INITIAL_GRID']}):"
+          f" Determines if the user will provide the initial grid or not.")
+    print(f"\nPOPULATION_SIZE ({constants['POPULATION_SIZE']}):"
+          f" The size of the population used in the genetic algorithm.")
+    print(f"\nSELECTED_POPULATION_SIZE ({constants['SELECTED_POPULATION_SIZE']}):"
+          f" The number of individuals selected for the next generation in the genetic algorithm.")
+    print(f"\nCROSSOVER_RATE ({constants['CROSSOVER_RATE']}):"
+          f" The probability of crossover happening between two individuals in the genetic algorithm.")
+    print(f"\nMUTATION_RATE ({constants['MUTATION_RATE']}):"
+          f" The probability of mutation happening in an individual in the genetic algorithm.")
+    print(f"\nELITISM_RATE ({constants['ELITISM_RATE']}):"
+          f" The percentage of the best individuals to be passed directly"
+          f" to the next generation in the genetic algorithm.")
+    print(f"\nMAX_GENERATIONS ({constants['MAX_GENERATIONS']}):"
+          f" The maximum number of generations that the genetic algorithm will run for.")
     print(f"\nMAX_FITNESS ({constants['MAX_FITNESS']}): The maximum fitness score an individual can get.")
 
 

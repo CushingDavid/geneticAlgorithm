@@ -1,10 +1,9 @@
-import multiprocessing
-
 from initial_pop import create_initial_population
 from helpers import write_fitness_scores_to_csv
 
 import numpy as np
 import random
+import multiprocessing
 
 
 def genetic_algorithm(constants, word):
