@@ -10,7 +10,7 @@ def admin_console():
 
     while True:
         print("\nOptions:")
-        print("1. Change Constant")
+        print("1. Change Value of a Constant")
         print("2. Exit")
 
         choice = input("Enter your choice: ")
@@ -18,8 +18,12 @@ def admin_console():
         if choice == '1':
             constant_name = input("Enter the name of the constant to change: ")
 
+            # Check if the constant name is 'USER_INITIAL_GRID'
+            if constant_name == 'USER_INITIAL_GRID':
+                constants[constant_name] = not constants[constant_name]
+                print("Constant 'USER_INITIAL_GRID' toggled successfully.")
             # Check if the constant exists and is valid for modification
-            if constant_name in constants and constant_name not in ['GRID_SIZE', 'SUBGRID_SIZE', 'MAX_FITNESS']:
+            elif constant_name in constants and constant_name not in ['GRID_SIZE', 'SUBGRID_SIZE', 'MAX_FITNESS']:
                 constant_value = input("Enter the new value: ")
                 try:
                     constant_value = type(constants[constant_name])(constant_value)
@@ -33,11 +37,11 @@ def admin_console():
                             print("Constant changed successfully.")
                     elif constant_name in ['CROSSOVER_RATE', 'MUTATION_RATE']:
                         # Check if the new value is within the valid range for CROSSOVER_RATE and MUTATION_RATE
-                        if 0.1 <= constant_value <= 1:
+                        if 0 <= constant_value <= 1:
                             constants[constant_name] = constant_value
                             print("Constant changed successfully.")
                         else:
-                            print("Crossover Rate and Mutation Rate should be between 0.1 and 1.")
+                            print("Crossover Rate and Mutation Rate should be between 0 and 1.")
                     else:
                         constants[constant_name] = constant_value
                         print("Constant changed successfully.")
@@ -77,14 +81,16 @@ def start_menu():
 
     while True:
         print("\nStart Menu:")
-        print("1. Run Genetic Algorithm")
-        print("2. Admin Console")
-        print("3. Explanation of Constants")
-        print("4. Exit")
+        print("1. Run Base Genetic Algorithm")
+        print("2. Run Genetic Algorithm with Elitism")
+        print("3. Admin Console")
+        print("4. Explanation of Constants")
+        print("5. Exit")
 
         choice = input("Enter your choice: ")
 
         if choice == '1':
+            constants['ELITISM_ENABLED'] = False
             word = word_select()
 
             # Run the genetic algorithm and get the highest fitness child and score
@@ -96,10 +102,22 @@ def start_menu():
             output_results(highest_fitness_child, highest_fitness_score)
 
         elif choice == '2':
-            admin_console()
+            constants['ELITISM_ENABLED'] = True
+            word = word_select()
+
+            # Run the genetic algorithm and get the highest fitness child and score
+            highest_fitness_child, highest_fitness_score = genetic_algorithm(
+                constants, word)
+
+            print("Genetic Algorithm with Elitism completed.")
+            # Output Results
+            output_results(highest_fitness_child, highest_fitness_score)
+
         elif choice == '3':
-            explain_constants()
+            admin_console()
         elif choice == '4':
+            explain_constants()
+        elif choice == '5':
             print("Exiting Program.")
             break
         else:
@@ -111,12 +129,13 @@ constants = {
     'GRID_SIZE': 4,
     'SUBGRID_SIZE': 2,
     'USER_INITIAL_GRID': True,
-    'POPULATION_SIZE': 1000,
-    'SELECTED_POPULATION_SIZE': 500,
+    'POPULATION_SIZE': 100,
+    'SELECTED_POPULATION_SIZE': 50,
     'CROSSOVER_RATE': 0.8,
-    'MUTATION_RATE': 0.8,
+    'MUTATION_RATE': 0.3,
+    'ELITISM_ENABLED': False,
     'ELITISM_RATE': 0.1,
-    'MAX_GENERATIONS': 10000,
+    'MAX_GENERATIONS': 1000,
     'MAX_FITNESS': 24
 }
 

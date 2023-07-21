@@ -65,6 +65,7 @@ def write_fitness_scores_to_csv(fitness_scores, population, output_file):
 
 def output_results(highest_fitness_child, highest_fitness_score):
     # Print the highest fitness child and score
+    print("Lowercase letters show initial values\nUppercase letters so mutated values\n")
     print(f"Highest Fitness Child: {highest_fitness_child}")
     print(f"Highest Fitness Score: {highest_fitness_score}\n")
     print("Grid:")

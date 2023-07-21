@@ -17,9 +17,6 @@ def genetic_algorithm(constants, word):
     generation_thresholds = [25, 50, 75]  # Percentage thresholds
 
     for generation in range(constants['MAX_GENERATIONS']):
-        row_fitness = []
-        col_fitness = []
-        subgroup_fitness = []
         # Evaluate fitness for each individual in the population
         fitness_scores = []
         for individual in population:
@@ -35,13 +32,20 @@ def genetic_algorithm(constants, word):
         if constants['MAX_FITNESS'] in fitness_scores:
             break
 
-        # Apply elitism by preserving a certain percentage of the fittest individuals
-        num_elites = int(constants['ELITISM_RATE'] * constants['POPULATION_SIZE'])
-        elite_indices = np.argsort(fitness_scores)[-num_elites:]
-        elites = [population[i] for i in elite_indices]
+        if constants['ELITISM_ENABLED']:
+            # Apply elitism by preserving a certain percentage of the fittest individuals
+            num_elites = int(constants['ELITISM_RATE'] * constants['POPULATION_SIZE'])
+            elite_indices = np.argsort(fitness_scores)[-num_elites:]
+            elites = [population[i] for i in elite_indices]
 
-        # Select best individuals as parents for the next generation (excluding elites)
-        non_elite_indices = np.argsort(fitness_scores)[:-num_elites]
+            # Select best individuals as parents for the next generation (excluding elites)
+            non_elite_indices = np.argsort(fitness_scores)[:-num_elites]
+        else:
+            # If elitism is not enabled, all individuals can be parents
+            non_elite_indices = np.argsort(fitness_scores)
+            elites = []
+
+        # Select parents for the next generation
         selected_parents = [population[i] for i in non_elite_indices]
 
         # Create empty list for children
@@ -63,7 +67,7 @@ def genetic_algorithm(constants, word):
         # Check and print progress at specific percentage thresholds
         for threshold in generation_thresholds:
             if progress == threshold:
-                print(f"Progress: {progress:.1f}% reached.")
+                print(f"Progress: {progress:.0f}% reached.")
 
     return highest_fitness_child, highest_fitness_score
 
@@ -105,7 +109,6 @@ def evaluate_fitness(constants, grid):
             else:
                 fitness -= 4
     # print(f"-----\n")
-
 
     return fitness
 
