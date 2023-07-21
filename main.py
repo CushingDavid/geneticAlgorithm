@@ -21,7 +21,7 @@ def admin_console():
             # Check if the constant name is 'USER_INITIAL_GRID'
             if constant_name == 'USER_INITIAL_GRID':
                 constants[constant_name] = not constants[constant_name]
-                print("Constant 'USER_INITIAL_GRID' toggled successfully.")
+                print(f"Constant {constants[constant_name]} toggled successfully.")
             # Check if the constant exists and is valid for modification
             elif constant_name in constants and constant_name not in ['GRID_SIZE', 'SUBGRID_SIZE', 'MAX_FITNESS']:
                 constant_value = input("Enter the new value: ")
