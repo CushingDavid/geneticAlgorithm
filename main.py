@@ -89,6 +89,7 @@ def start_menu():
     print("This algorithm reflects the process of natural selection where the fittest individuals "
           "are selected for reproduction.")
     print("The goal of the program is to evolve a population to get a grid with maximum fitness.\n")
+    print("\n---\nNOTE: for maximum performance at high populations, set WRITE_TO_CSV to False before running.\n---\n")
 
     while True:
         print("\nStart Menu:")
@@ -140,13 +141,14 @@ constants = {
     'GRID_SIZE': 4,
     'SUBGRID_SIZE': 2,
     'USER_INITIAL_GRID': False,
-    'POPULATION_SIZE': 1000,
-    'SELECTED_POPULATION_SIZE': 500,
+    'WRITE_TO_CSV': True,
+    'POPULATION_SIZE': 100,
+    'SELECTED_POPULATION_SIZE': 10,
     'CROSSOVER_RATE': 0.8,
     'MUTATION_RATE': 0.3,
     'ELITISM_ENABLED': False,
     'ELITISM_RATE': 0.1,
-    'MAX_GENERATIONS': 10000,
+    'MAX_GENERATIONS': 100,
     'MAX_FITNESS': 24
 }
 

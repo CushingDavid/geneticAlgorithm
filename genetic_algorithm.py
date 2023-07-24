@@ -1,5 +1,5 @@
 from initial_pop import create_initial_population
-from helpers import write_fitness_scores_to_csv
+from helpers import write_fitness_scores_to_csv, find_highest_fitness_child
 
 import numpy as np
 import random
@@ -23,9 +23,13 @@ def genetic_algorithm(constants, word):
             fitness_scores = pool.starmap(evaluate_fitness, [(constants, individual) for individual in population])
 
             # Write fitness scores and get the highest fitness child
-            highest_fitness_child, highest_fitness_score = write_fitness_scores_to_csv(fitness_scores,
-                                                                                       population,
-                                                                                       'fitness_scores.csv',)
+            highest_fitness_child, highest_fitness_score = find_highest_fitness_child(fitness_scores, population)
+            if constants['WRITE_TO_CSV']:
+                write_fitness_scores_to_csv(highest_fitness_child,
+                                            highest_fitness_score,
+                                            'fitness_scores.csv', )
+            else:
+                find_highest_fitness_child(fitness_scores, population)
 
             # Check termination condition
             if constants['MAX_FITNESS'] in fitness_scores:
