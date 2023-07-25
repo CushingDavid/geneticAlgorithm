@@ -56,7 +56,10 @@ def genetic_algorithm(constants, word):
 
             # Generate offspring through crossover
             for _ in range(constants['SELECTED_POPULATION_SIZE']):
-                child = crossover(constants, selected_parents[0], selected_parents[1])
+                # select two parents randomly
+                parent1 = random.choice(selected_parents)
+                parent2 = random.choice(selected_parents)
+                child = crossover(constants, parent1, parent2)
                 children.append(child)
 
             # Mutate the children
