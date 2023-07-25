@@ -1,6 +1,22 @@
 from helpers import word_select, output_results
 from genetic_algorithm import genetic_algorithm
 
+# Constants for the core program.
+constants = {
+    'GRID_SIZE': 4,
+    'SUBGRID_SIZE': 2,
+    'USER_INITIAL_GRID': True,
+    'WRITE_TO_CSV': True,
+    'POPULATION_SIZE': 1000,
+    'SELECTED_POPULATION_SIZE': 100,
+    'CROSSOVER_RATE': 0.8,
+    'MUTATION_RATE': 0.3,
+    'ELITISM_ENABLED': True,
+    'ELITISM_RATE': 0.1,
+    'MAX_GENERATIONS': 10000,
+    'MAX_FITNESS': 24
+}
+
 
 def admin_console():
     print("Admin Console")
@@ -65,6 +81,8 @@ def explain_constants():
           f" The size of the sub-grid in the puzzle (e.g., 2 for a 2x2 sub-grid).")
     print(f"\nUSER_INITIAL_GRID ({constants['USER_INITIAL_GRID']}):"
           f" Determines if the user will provide the initial grid or not.")
+    print(f"\nWRITE_TO_CSV ({constants['WRITE_TO_CSV']}):"
+          f" Write highest fitness per population to a csv file")
     print(f"\nPOPULATION_SIZE ({constants['POPULATION_SIZE']}):"
           f" The size of the population used in the genetic algorithm.")
     print(f"\nSELECTED_POPULATION_SIZE ({constants['SELECTED_POPULATION_SIZE']}):"
@@ -134,23 +152,6 @@ def start_menu():
             break
         else:
             print("Invalid choice. Please try again.")
-
-
-# Constants
-constants = {
-    'GRID_SIZE': 4,
-    'SUBGRID_SIZE': 2,
-    'USER_INITIAL_GRID': True,
-    'WRITE_TO_CSV': True,
-    'POPULATION_SIZE': 1000,
-    'SELECTED_POPULATION_SIZE': 500,
-    'CROSSOVER_RATE': 0.8,
-    'MUTATION_RATE': 0.3,
-    'ELITISM_ENABLED': True,
-    'ELITISM_RATE': 0.1,
-    'MAX_GENERATIONS': 10000,
-    'MAX_FITNESS': 24
-}
 
 
 if __name__ == '__main__':
