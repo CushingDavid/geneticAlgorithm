@@ -80,24 +80,30 @@ def genetic_algorithm(constants, word):
 
 def evaluate_fitness(constants, grid):
     fitness = 0
+    unique_rows = set()
+    unique_cols = set()
+    unique_subgrids = set()
+
     # Check rows
     for row in grid:
-        row_letters = [cell.lower() if cell != '-' else '-' for cell in row]
-        if '-' in row_letters or len(row_letters) != len(set(row_letters)):
+        row_letters = [cell.lower() for cell in row if cell != '-']
+        row_letters_str = ''.join(row_letters)
+        if len(row_letters) != len(set(row_letters)) or row_letters_str in unique_rows:
             fitness -= 1
         else:
             fitness += 1
-        # print(f"row: {row_words} | {row_score}")
+            unique_rows.add(row_letters_str)
 
     # Check columns
     for j in range(constants['GRID_SIZE']):
         column = [grid[i][j] for i in range(constants['GRID_SIZE'])]
-        column_words = [cell.lower() if cell != '-' else '-' for cell in column]
-        if '-' in column_words or len(column_words) != len(set(column_words)):
+        column_letters = [cell.lower() for cell in column if cell != '-']
+        column_letters_str = ''.join(column_letters)
+        if len(column_letters) != len(set(column_letters)) or column_letters_str in unique_cols:
             fitness -= 1
         else:
             fitness += 1
-        # print(f"col: {column_words} | {col_score}")
+            unique_cols.add(column_letters_str)
 
     # Check subgroups
     for i in range(0, constants['GRID_SIZE'], constants['SUBGRID_SIZE']):
@@ -108,10 +114,11 @@ def evaluate_fitness(constants, grid):
                     letter = grid[x][y]
                     if letter != '-':
                         subgrid_letters.append(letter.lower())
-
+            subgrid_letters_str = ''.join(subgrid_letters)
             if len(set(subgrid_letters)) == constants['SUBGRID_SIZE'] * constants['SUBGRID_SIZE'] \
-                    and '-' not in subgrid_letters:
+                    and subgrid_letters_str not in unique_subgrids:
                 fitness += 4
+                unique_subgrids.add(subgrid_letters_str)
             else:
                 fitness -= 4
 
