@@ -85,30 +85,37 @@ def genetic_algorithm(constants, word):
 
 def evaluate_fitness(constants, grid):
     fitness = 0
-    unique_rows = set()
-    unique_cols = set()
-    unique_subgrids = set()
+    unique_rows = set()     # Set to store unique rows
+    unique_cols = set()     # Set to store unique columns
+    unique_subgrids = set() # Set to store unique subgrids
 
     # Check rows
     for row in grid:
+        # Convert row cells to lowercase letters, excluding '-'
         row_letters = [cell.lower() for cell in row if cell != '-']
-        row_letters_str = ''.join(row_letters)
+        row_letters_str = ''.join(row_letters)    # Concatenate row letters to a string
         if len(row_letters) != len(set(row_letters)) or row_letters_str in unique_rows:
+            # If the row has repeated letters or if this row configuration has been seen before, penalize the fitness
             fitness -= 1
         else:
+            # If the row has unique letters and it's a new configuration, increase the fitness
             fitness += 1
-            unique_rows.add(row_letters_str)
+            unique_rows.add(row_letters_str) # Store the row configuration in the set to track uniqueness
 
     # Check columns
     for j in range(constants['GRID_SIZE']):
-        column = [grid[i][j] for i in range(constants['GRID_SIZE'])]
+        column = [grid[i][j] for i in range(constants['GRID_SIZE'])] # Extract a column from the grid
+        # Convert column cells to lowercase letters, excluding '-'
         column_letters = [cell.lower() for cell in column if cell != '-']
-        column_letters_str = ''.join(column_letters)
+        column_letters_str = ''.join(column_letters)    # Concatenate column letters to a string
         if len(column_letters) != len(set(column_letters)) or column_letters_str in unique_cols:
+            # If the column has repeated letters or if this column configuration has been seen before, penalize the
+            # fitness
             fitness -= 1
         else:
+            # If the column has unique letters and it's a new configuration, increase the fitness
             fitness += 1
-            unique_cols.add(column_letters_str)
+            unique_cols.add(column_letters_str) # Store the column configuration in the set to track uniqueness
 
     # Check subgroups
     for i in range(0, constants['GRID_SIZE'], constants['SUBGRID_SIZE']):
@@ -116,15 +123,17 @@ def evaluate_fitness(constants, grid):
             subgrid_letters = []
             for x in range(i, i + constants['SUBGRID_SIZE']):
                 for y in range(j, j + constants['SUBGRID_SIZE']):
-                    letter = grid[x][y]
+                    letter = grid[x][y] # Extract a cell from the subgrid
                     if letter != '-':
-                        subgrid_letters.append(letter.lower())
-            subgrid_letters_str = ''.join(subgrid_letters)
+                        subgrid_letters.append(letter.lower()) # Convert subgrid cells to lowercase letters, excluding '-'
+            subgrid_letters_str = ''.join(subgrid_letters)    # Concatenate subgrid letters to a string
             if len(set(subgrid_letters)) == constants['SUBGRID_SIZE'] * constants['SUBGRID_SIZE'] \
                     and subgrid_letters_str not in unique_subgrids:
+                # If the subgrid has unique letters and it's a new configuration, increase the fitness significantly
                 fitness += 4
-                unique_subgrids.add(subgrid_letters_str)
+                unique_subgrids.add(subgrid_letters_str) # Store the subgrid configuration in the set to track uniqueness
             else:
+                # If the subgrid has repeated letters or it has been seen before, penalize the fitness
                 fitness -= 4
 
     return fitness

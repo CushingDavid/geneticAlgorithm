@@ -1,16 +1,18 @@
 from helpers import word_select, output_results
 from genetic_algorithm import genetic_algorithm
 
+import time
+
 # Constants for the core program.
 constants = {
     'GRID_SIZE': 4,
     'SUBGRID_SIZE': 2,
     'USER_INITIAL_GRID': True,
     'WRITE_TO_CSV': True,
-    'POPULATION_SIZE': 1000,
-    'SELECTED_POPULATION_SIZE': 100,
-    'CROSSOVER_RATE': 0.8,
-    'MUTATION_RATE': 0.3,
+    'POPULATION_SIZE': 10000,
+    'SELECTED_POPULATION_SIZE': 200,
+    'CROSSOVER_RATE': 0.5,
+    'MUTATION_RATE': 0.5,
     'ELITISM_ENABLED': True,
     'ELITISM_RATE': 0.1,
     'MAX_GENERATIONS': 10000,
@@ -123,23 +125,30 @@ def start_menu():
             constants['ELITISM_ENABLED'] = False
             word = word_select()
 
-            # Run the genetic algorithm and get the highest fitness child and score
+            # Run the genetic algorithm and get the highest fitness child, it's score and a tuple of max fitness
+            # solutions
+            start_time = time.time()
             highest_fitness_child, highest_fitness_score, max_fitness_solutions = genetic_algorithm(
                 constants, word)
+            end_time = time.time()
+            elapsed_time = end_time - start_time
 
-            print("\nGenetic Algorithm completed.")
+            print(f"\nGenetic Algorithm completed in {elapsed_time:.3f} seconds.")
             # Output Results
             output_results(highest_fitness_child, highest_fitness_score, max_fitness_solutions)
 
         elif choice == '2':
             constants['ELITISM_ENABLED'] = True
             word = word_select()
-
-            # Run the genetic algorithm and get the highest fitness child and score
+            start_time = time.time()
+            # Run the genetic algorithm and get the highest fitness child, it's score and a tuple of max fitness
+            # solutions
             highest_fitness_child, highest_fitness_score, max_fitness_solutions = genetic_algorithm(
                 constants, word)
+            end_time = time.time()
+            elapsed_time = end_time - start_time
 
-            print("Genetic Algorithm with Elitism completed.")
+            print(f"\nGenetic Algorithm with Elitism completed in {elapsed_time:.3f} seconds.")
             # Output Results
             output_results(highest_fitness_child, highest_fitness_score, max_fitness_solutions)
 
