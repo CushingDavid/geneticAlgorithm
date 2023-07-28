@@ -11,6 +11,7 @@ def genetic_algorithm(constants, word):
     population = create_initial_population(constants, word)
     print("\nPopulations created\nGenetic Algorithm starting...\n")
 
+    max_fitness_solutions = set()
     highest_fitness_child = None
     highest_fitness_score = float('-inf')
 
@@ -23,17 +24,21 @@ def genetic_algorithm(constants, word):
             fitness_scores = pool.starmap(evaluate_fitness, [(constants, individual) for individual in population])
 
             # Write fitness scores and get the highest fitness child
-            highest_fitness_child, highest_fitness_score = find_highest_fitness_child(fitness_scores, population)
+            highest_fitness_child_current, highest_fitness_score_current = find_highest_fitness_child(fitness_scores,
+                                                                                                      population)
+
+            if highest_fitness_score_current > highest_fitness_score:
+                highest_fitness_score = highest_fitness_score_current
+                highest_fitness_child = highest_fitness_child_current
+
             if constants['WRITE_TO_CSV']:
                 write_fitness_scores_to_csv(highest_fitness_child,
-                                            highest_fitness_score,
+                                            highest_fitness_score_current,
                                             'fitness_scores.csv', )
-            else:
-                find_highest_fitness_child(fitness_scores, population)
 
-            # Check termination condition
-            if constants['MAX_FITNESS'] in fitness_scores:
-                break
+            # Add highest fitness solution to set
+            if highest_fitness_score_current == constants['MAX_FITNESS']:
+                max_fitness_solutions.add(str(highest_fitness_child))
 
             if constants['ELITISM_ENABLED']:
                 # Apply elitism by preserving a certain percentage of the fittest individuals
@@ -75,7 +80,7 @@ def genetic_algorithm(constants, word):
                 if progress == threshold:
                     print(f"Progress: {progress:.0f}% reached.")
 
-    return highest_fitness_child, highest_fitness_score
+    return highest_fitness_child, highest_fitness_score, max_fitness_solutions
 
 
 def evaluate_fitness(constants, grid):

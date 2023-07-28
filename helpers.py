@@ -1,3 +1,4 @@
+import ast
 import csv
 
 
@@ -59,14 +60,28 @@ def write_fitness_scores_to_csv(child, score, output_file):
         writer.writerow([str(child), str(score)])
 
 
-def output_results(highest_fitness_child, highest_fitness_score):
-    # Print the highest fitness child and score
-    print("Lowercase letters show initial values\nUppercase letters so mutated values\n")
-    print(f"Highest Fitness Child: {highest_fitness_child}")
-    print(f"Highest Fitness Score: {highest_fitness_score}\n")
-    print("Grid:")
+def output_results(highest_fitness_child, highest_fitness_score, max_fitness_solutions):
+    # If max fitness solutions exist
+    if max_fitness_solutions:
+        print(f"\nMax Fitness Solutions: {len(max_fitness_solutions)}")
+        for solution_str in max_fitness_solutions:
+            solution = ast.literal_eval(solution_str)
+            print_grid(solution)
+            print()
 
-    # Print the grid of the highest fitness child
-    for row in highest_fitness_child:
+    # If no max fitness solutions, print the highest fitness child
+    else:
+        print("\nNo Max Fitness Solution Found.")
+        print("Highest Fitness Score: ", highest_fitness_score)
+        print("Highest Fitness Child: ")
+        print_grid(highest_fitness_child)
+
+
+def print_grid(grid):
+    # Prints the grid
+    print("Grid:")
+    for row in grid:
         print(row)
+
+
 

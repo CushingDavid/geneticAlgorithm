@@ -124,24 +124,24 @@ def start_menu():
             word = word_select()
 
             # Run the genetic algorithm and get the highest fitness child and score
-            highest_fitness_child, highest_fitness_score = genetic_algorithm(
+            highest_fitness_child, highest_fitness_score, max_fitness_solutions = genetic_algorithm(
                 constants, word)
 
-            print("Genetic Algorithm completed.")
+            print("\nGenetic Algorithm completed.")
             # Output Results
-            output_results(highest_fitness_child, highest_fitness_score)
+            output_results(highest_fitness_child, highest_fitness_score, max_fitness_solutions)
 
         elif choice == '2':
             constants['ELITISM_ENABLED'] = True
             word = word_select()
 
             # Run the genetic algorithm and get the highest fitness child and score
-            highest_fitness_child, highest_fitness_score = genetic_algorithm(
+            highest_fitness_child, highest_fitness_score, max_fitness_solutions = genetic_algorithm(
                 constants, word)
 
             print("Genetic Algorithm with Elitism completed.")
             # Output Results
-            output_results(highest_fitness_child, highest_fitness_score)
+            output_results(highest_fitness_child, highest_fitness_score, max_fitness_solutions)
 
         elif choice == '3':
             admin_console()
