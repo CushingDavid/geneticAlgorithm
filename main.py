@@ -14,7 +14,7 @@ constants = {
     'CROSSOVER_RATE': 0.3,
     'MUTATION_RATE': 0.8,
     'ELITISM_ENABLED': True,
-    'ELITISM_RATE': 0.1,
+    'ELITISM_RATE': 0.2,
     'MAX_GENERATIONS': 10000,
     'MAX_FITNESS': 24
 }
