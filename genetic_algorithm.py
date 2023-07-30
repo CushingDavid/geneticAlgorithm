@@ -39,6 +39,10 @@ def genetic_algorithm(constants, word):
             # Add highest fitness solution to set
             if highest_fitness_score_current == constants['MAX_FITNESS']:
                 max_fitness_solutions.add(str(highest_fitness_child))
+                highest_fitness_child = None
+                highest_fitness_score = float('-inf')
+                highest_fitness_score_current = float('-inf')
+                highest_fitness_child_current = None
 
             if constants['ELITISM_ENABLED']:
                 # Apply elitism by preserving a certain percentage of the fittest individuals
