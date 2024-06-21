@@ -1,6 +1,24 @@
 from helpers import word_select, output_results
 from genetic_algorithm import genetic_algorithm
 
+import time
+
+# Constants for the core program.
+constants = {
+    'GRID_SIZE': 4,
+    'SUBGRID_SIZE': 2,
+    'USER_INITIAL_GRID': True,
+    'WRITE_TO_CSV': True,
+    'POPULATION_SIZE': 1000,
+    'SELECTED_POPULATION_SIZE': 200,
+    'CROSSOVER_RATE': 0.3,
+    'MUTATION_RATE': 0.8,
+    'ELITISM_ENABLED': True,
+    'ELITISM_RATE': 0.2,
+    'MAX_GENERATIONS': 10000,
+    'MAX_FITNESS': 24
+}
+
 
 def admin_console():
     print("Admin Console")
@@ -10,29 +28,39 @@ def admin_console():
 
     while True:
         print("\nOptions:")
-        print("1. Change Constant")
+        print("1. Change Value of a Constant")
         print("2. Exit")
 
         choice = input("Enter your choice: ")
 
         if choice == '1':
             constant_name = input("Enter the name of the constant to change: ")
-            if constant_name in constants and constant_name not in ['GRID_SIZE', 'SUBGRID_SIZE', 'MAX_FITNESS']:
+
+            # Check if the constant name is 'USER_INITIAL_GRID'
+            if constant_name == 'USER_INITIAL_GRID':
+                # Toggle
+                constants[constant_name] = not constants[constant_name]
+                print(f"Constant {constants[constant_name]} toggled successfully.")
+            # Check if the constant exists and is valid for modification
+            elif constant_name in constants and constant_name not in ['GRID_SIZE', 'SUBGRID_SIZE', 'MAX_FITNESS']:
                 constant_value = input("Enter the new value: ")
                 try:
                     constant_value = type(constants[constant_name])(constant_value)
+
                     if constant_name == 'SELECTED_POPULATION_SIZE':
+                        # Check if the new value is valid for SELECTED_POPULATION_SIZE
                         if constant_value > constants['POPULATION_SIZE']:
                             print("Selected Population Size should not be bigger than Population Size.")
                         else:
                             constants[constant_name] = constant_value
                             print("Constant changed successfully.")
                     elif constant_name in ['CROSSOVER_RATE', 'MUTATION_RATE']:
-                        if 0.1 <= constant_value <= 1:
+                        # Check if the new value is within the valid range for CROSSOVER_RATE and MUTATION_RATE
+                        if 0 <= constant_value <= 1:
                             constants[constant_name] = constant_value
                             print("Constant changed successfully.")
                         else:
-                            print("Crossover Rate and Mutation Rate should be between 0.1 and 1.")
+                            print("Crossover Rate and Mutation Rate should be between 0 and 1.")
                     else:
                         constants[constant_name] = constant_value
                         print("Constant changed successfully.")
@@ -47,44 +75,93 @@ def admin_console():
             print("Invalid choice. Please try again.")
 
 
+def explain_constants():
+    print("\nExplanation of Constants:")
+    print(f"\nGRID_SIZE ({constants['GRID_SIZE']}):"
+          f" The size of the grid in the puzzle (e.g., 4 for a 4x4 grid).")
+    print(f"\nSUBGRID_SIZE ({constants['SUBGRID_SIZE']}):"
+          f" The size of the sub-grid in the puzzle (e.g., 2 for a 2x2 sub-grid).")
+    print(f"\nUSER_INITIAL_GRID ({constants['USER_INITIAL_GRID']}):"
+          f" Determines if the user will provide the initial grid or not.")
+    print(f"\nWRITE_TO_CSV ({constants['WRITE_TO_CSV']}):"
+          f" Write highest fitness per population to a csv file")
+    print(f"\nPOPULATION_SIZE ({constants['POPULATION_SIZE']}):"
+          f" The size of the population used in the genetic algorithm.")
+    print(f"\nSELECTED_POPULATION_SIZE ({constants['SELECTED_POPULATION_SIZE']}):"
+          f" The number of individuals selected for the next generation in the genetic algorithm.")
+    print(f"\nCROSSOVER_RATE ({constants['CROSSOVER_RATE']}):"
+          f" The probability of crossover happening between two individuals in the genetic algorithm.")
+    print(f"\nMUTATION_RATE ({constants['MUTATION_RATE']}):"
+          f" The probability of mutation happening in an individual in the genetic algorithm.")
+    print(f"\nELITISM_RATE ({constants['ELITISM_RATE']}):"
+          f" The percentage of the best individuals to be passed directly"
+          f" to the next generation in the genetic algorithm.")
+    print(f"\nMAX_GENERATIONS ({constants['MAX_GENERATIONS']}):"
+          f" The maximum number of generations that the genetic algorithm will run for.")
+    print(f"\nMAX_FITNESS ({constants['MAX_FITNESS']}): The maximum fitness score an individual can get.")
+
+
 def start_menu():
     print("Welcome to the Genetic Algorithm!")
+    print("\nThis program uses a genetic algorithm to solve a unique puzzle based on a user-selected word.")
+    print(
+        "The genetic algorithm is a search heuristic that is inspired by Charles Darwin's theory of natural evolution.")
+    print("This algorithm reflects the process of natural selection where the fittest individuals "
+          "are selected for reproduction.")
+    print("The goal of the program is to evolve a population to get a grid with maximum fitness.\n")
+    print("\n---\nNOTE: for maximum performance at high populations, set WRITE_TO_CSV to False before running.\n---\n")
 
     while True:
         print("\nStart Menu:")
-        print("1. Run Genetic Algorithm")
-        print("2. Admin Console")
-        print("3. Exit")
+        print("1. Run Base Genetic Algorithm")
+        print("2. Run Genetic Algorithm with Elitism")
+        print("3. Admin Console")
+        print("4. Explanation of Constants")
+        print("5. Exit")
 
         choice = input("Enter your choice: ")
 
         if choice == '1':
+            constants['ELITISM_ENABLED'] = False
             word = word_select()
-            highest_fitness_child, highest_fitness_score = genetic_algorithm(constants, word)
-            print("Genetic Algorithm completed.")
-            output_results(highest_fitness_child, highest_fitness_score)
+
+            # Run the genetic algorithm and get the highest fitness child, it's score and a tuple of max fitness
+            # solutions
+            start_time = time.time()
+            highest_fitness_child, highest_fitness_score, max_fitness_solutions = genetic_algorithm(
+                constants, word)
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+
+            print(f"\nGenetic Algorithm completed in {elapsed_time:.3f} seconds.")
+            # Output Results
+            output_results(highest_fitness_child, highest_fitness_score, max_fitness_solutions)
+
         elif choice == '2':
-            admin_console()
+            constants['ELITISM_ENABLED'] = True
+            word = word_select()
+            start_time = time.time()
+            # Run the genetic algorithm and get the highest fitness child, it's score and a tuple of max fitness
+            # solutions
+            highest_fitness_child, highest_fitness_score, max_fitness_solutions = genetic_algorithm(
+                constants, word)
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+
+            print(f"\nGenetic Algorithm with Elitism completed in {elapsed_time:.3f} seconds.")
+            # Output Results
+            output_results(highest_fitness_child, highest_fitness_score, max_fitness_solutions)
+
         elif choice == '3':
+            admin_console()
+        elif choice == '4':
+            explain_constants()
+        elif choice == '5':
             print("Exiting Program.")
             break
         else:
             print("Invalid choice. Please try again.")
 
 
-# Constants
-constants = {
-    'GRID_SIZE': 4,
-    'SUBGRID_SIZE': 2,
-    'POPULATION_SIZE': 1000,
-    'SELECTED_POPULATION_SIZE': 500,
-    'CROSSOVER_RATE': 0.5,
-    'MUTATION_RATE': 0.8,
-    'MAX_GENERATIONS': 1000,
-    'MAX_FITNESS': 24
-}
-
-# Start Menu
-start_menu()
-
-
+if __name__ == '__main__':
+    start_menu()

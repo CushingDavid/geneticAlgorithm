@@ -1,62 +1,125 @@
 from initial_pop import create_initial_population
-from helpers import write_fitness_scores_to_csv, check_termination_condition, output_results
+from helpers import write_fitness_scores_to_csv, find_highest_fitness_child
 
 import numpy as np
 import random
+import multiprocessing
 
 
 def genetic_algorithm(constants, word):
     # Create initial population
     population = create_initial_population(constants, word)
+    print("\nPopulations created\nGenetic Algorithm starting...\n")
 
+    max_fitness_solutions = set()
     highest_fitness_child = None
     highest_fitness_score = float('-inf')
 
-    for generation in range(constants['MAX_GENERATIONS']):
-        # Evaluate fitness for each individual in the population
-        fitness_scores = [evaluate_fitness(constants, individual, word) for individual in population]
+    max_generations = constants['MAX_GENERATIONS']
+    generation_thresholds = [10, 20, 30, 40, 50, 60, 70, 80, 90]  # Percentage thresholds
 
-        # Write fitness scores and get the highest fitness child
-        highest_fitness_child, highest_fitness_score = write_fitness_scores_to_csv(fitness_scores, population, 'fitness_scores.csv')
+    with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
+        for generation in range(constants['MAX_GENERATIONS']):
+            # Evaluate fitness for each individual in the population
+            fitness_scores = pool.starmap(evaluate_fitness, [(constants, individual) for individual in population])
 
-        # Check termination condition
-        if constants['MAX_FITNESS'] in fitness_scores:
-            break
+            # Write fitness scores and get the highest fitness child
+            highest_fitness_child_current, highest_fitness_score_current = find_highest_fitness_child(fitness_scores,
+                                                                                                      population)
 
-        # Select best individuals as parents for the next generation
-        selected_indices = np.argsort(fitness_scores)[-constants['SELECTED_POPULATION_SIZE']:]
-        selected_parents = [population[i] for i in selected_indices]
+            if highest_fitness_score_current > highest_fitness_score:
+                highest_fitness_score = highest_fitness_score_current
+                highest_fitness_child = highest_fitness_child_current
 
-        # Create empty list for children
-        children = []
+            if constants['WRITE_TO_CSV']:
+                write_fitness_scores_to_csv(highest_fitness_child,
+                                            highest_fitness_score_current,
+                                            'fitness_scores.csv', )
 
-        # Generate offspring through crossover
-        for _ in range(constants['SELECTED_POPULATION_SIZE']):
-            child = crossover(constants, selected_parents[0], selected_parents[1])
-            children.append(child)
+            # Add highest fitness solution to set
+            if highest_fitness_score_current == constants['MAX_FITNESS']:
+                max_fitness_solutions.add(str(highest_fitness_child))
+                highest_fitness_child = None
+                highest_fitness_score = float('-inf')
+                highest_fitness_score_current = float('-inf')
+                highest_fitness_child_current = None
 
-        # Mutate the children
-        mutated_children = mutate(children, constants['MUTATION_RATE'], word)
+            if constants['ELITISM_ENABLED']:
+                # Apply elitism by preserving a certain percentage of the fittest individuals
+                num_elites = int(constants['ELITISM_RATE'] * constants['POPULATION_SIZE'])
+                elite_indices = np.argsort(fitness_scores)[-num_elites:]
+                elites = [population[i] for i in elite_indices]
 
-        # Replace the population with mutated children
-        population = mutated_children
+                # Select best individuals as parents for the next generation (excluding elites)
+                non_elite_indices = np.argsort(fitness_scores)[:-num_elites]
+            else:
+                # If elitism is not enabled, all individuals can be parents
+                non_elite_indices = np.argsort(fitness_scores)
+                elites = []
 
-    return highest_fitness_child, highest_fitness_score
+            # Select parents for the next generation
+            selected_parents = [population[i] for i in non_elite_indices]
+
+            # Create empty list for children
+            children = []
+
+            # Generate offspring through crossover
+            for _ in range(constants['SELECTED_POPULATION_SIZE']):
+                # select two parents randomly
+                parent1 = random.choice(selected_parents)
+                parent2 = random.choice(selected_parents)
+                child = crossover(constants, parent1, parent2)
+                children.append(child)
+
+            # Mutate the children
+            mutated_children = mutate(children, constants['MUTATION_RATE'], word)
+
+            # Replace the population with mutated children and elites
+            population = mutated_children + elites
+
+            progress = (generation + 1) / max_generations * 100
+
+            # Check and print progress at specific percentage thresholds
+            for threshold in generation_thresholds:
+                if progress == threshold:
+                    print(f"Progress: {progress:.0f}% reached.")
+
+    return highest_fitness_child, highest_fitness_score, max_fitness_solutions
 
 
-def evaluate_fitness(constants, grid, word):
+def evaluate_fitness(constants, grid):
     fitness = 0
+    unique_rows = set()     # Set to store unique rows
+    unique_cols = set()     # Set to store unique columns
+    unique_subgrids = set() # Set to store unique subgrids
 
     # Check rows
     for row in grid:
-        if all(cell in word for cell in row):
+        # Convert row cells to lowercase letters, excluding '-'
+        row_letters = [cell.lower() for cell in row if cell != '-']
+        row_letters_str = ''.join(row_letters)    # Concatenate row letters to a string
+        if len(row_letters) != len(set(row_letters)) or row_letters_str in unique_rows:
+            # If the row has repeated letters or if this row configuration has been seen before, penalize the fitness
+            fitness -= 1
+        else:
+            # If the row has unique letters and it's a new configuration, increase the fitness
             fitness += 1
+            unique_rows.add(row_letters_str) # Store the row configuration in the set to track uniqueness
 
     # Check columns
     for j in range(constants['GRID_SIZE']):
-        column = [grid[i][j] for i in range(constants['GRID_SIZE'])]
-        if all(cell in word for cell in column):
+        column = [grid[i][j] for i in range(constants['GRID_SIZE'])] # Extract a column from the grid
+        # Convert column cells to lowercase letters, excluding '-'
+        column_letters = [cell.lower() for cell in column if cell != '-']
+        column_letters_str = ''.join(column_letters)    # Concatenate column letters to a string
+        if len(column_letters) != len(set(column_letters)) or column_letters_str in unique_cols:
+            # If the column has repeated letters or if this column configuration has been seen before, penalize the
+            # fitness
+            fitness -= 1
+        else:
+            # If the column has unique letters and it's a new configuration, increase the fitness
             fitness += 1
+            unique_cols.add(column_letters_str) # Store the column configuration in the set to track uniqueness
 
     # Check subgroups
     for i in range(0, constants['GRID_SIZE'], constants['SUBGRID_SIZE']):
@@ -64,13 +127,18 @@ def evaluate_fitness(constants, grid, word):
             subgrid_letters = []
             for x in range(i, i + constants['SUBGRID_SIZE']):
                 for y in range(j, j + constants['SUBGRID_SIZE']):
-                    letter = grid[x][y]
-                    if letter in subgrid_letters:
-                        fitness -= 2  # Decrease fitness if a letter is repeated in the subgrid
-                    subgrid_letters.append(letter.upper())
-
-            if len(set(subgrid_letters)) == constants['SUBGRID_SIZE'] * constants['SUBGRID_SIZE']:
-                fitness += 4  # Add 4 to fitness if subgrid_letters has 4 unique elements
+                    letter = grid[x][y] # Extract a cell from the subgrid
+                    if letter != '-':
+                        subgrid_letters.append(letter.lower()) # Convert subgrid cells to lowercase letters, excluding '-'
+            subgrid_letters_str = ''.join(subgrid_letters)    # Concatenate subgrid letters to a string
+            if len(set(subgrid_letters)) == constants['SUBGRID_SIZE'] * constants['SUBGRID_SIZE'] \
+                    and subgrid_letters_str not in unique_subgrids:
+                # If the subgrid has unique letters and it's a new configuration, increase the fitness significantly
+                fitness += 4
+                unique_subgrids.add(subgrid_letters_str) # Store the subgrid configuration in the set to track uniqueness
+            else:
+                # If the subgrid has repeated letters or it has been seen before, penalize the fitness
+                fitness -= 4
 
     return fitness
 
@@ -80,10 +148,16 @@ def crossover(constants, parent1, parent2):
 
     for i in range(constants['GRID_SIZE']):
         for j in range(constants['GRID_SIZE']):
-            if random.random() < constants['CROSSOVER_RATE']:
+            # Skip crossover if the letter from parent1 is lowercase
+            if parent1[i][j].islower():
                 child[i][j] = parent1[i][j]
             else:
-                child[i][j] = parent2[i][j]
+                if random.random() < constants['CROSSOVER_RATE']:
+                    # Select gene from parent 1 if crossover occurs
+                    child[i][j] = parent1[i][j]
+                else:
+                    # Select gene from parent 2 if crossover doesn't occur
+                    child[i][j] = parent2[i][j]
 
     return child
 
@@ -95,6 +169,7 @@ def mutate(children, mutation_rate, word):
                 if child[i][j] == "-" or child[i][j].isupper():
                     if random.random() < mutation_rate:
                         valid_letters = [letter.upper() for letter in word]
+                        # Mutate the gene by selecting a random letter from the valid letters
                         child[i][j] = random.choice(valid_letters)
 
     return children

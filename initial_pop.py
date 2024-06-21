@@ -1,33 +1,46 @@
+from helpers import set_initial_grid
+
 import random
+import copy
 
 
 def create_initial_population(constants, word):
-    """
-    parent1 = [['w','d','r','o'],['o','r','w','d'],['r','o','d','w'],['d','w','o','r']]
-    parent2 = [['w','d','r','o'],['o','r','w','d'],['r','o','d','w'],['d','w','o','r']]
-
-    parent1 = [['w','','','o'],
-           ['o','r','','d'],
-           ['r','','',''],
-           ['','','o','r']]
-    parent2 = [['w','','r','o'],
-           ['','r','w','d'],
-           ['r','','d','w'],
-           ['d','w','o','r']]
-    """
     population = []
+
+    # Generate individuals for the population
     for _ in range(constants['POPULATION_SIZE']):
-        individual = [['-' for _ in range(constants['GRID_SIZE'])] for _ in range(constants['GRID_SIZE'])]
-        total_slots = constants['GRID_SIZE'] * constants['GRID_SIZE']
-        num_mutations = int(constants['MUTATION_RATE'] * total_slots)
-        mutation_indices = random.sample(range(total_slots), num_mutations)
+        # Check if the option to use the set_initial_grid function is enabled
+        if constants['USER_INITIAL_GRID']:
+            # If we're generating the first two individuals, use the initial grid
+            if len(population) < 2:
+                individual = set_initial_grid(constants, word, len(population)+1)
+            else:  # Otherwise, copy the initial grid
+                individual = copy.deepcopy(population[0])
+        else:
+            # Create an individual grid filled with '-'
+            individual = [['-' for _ in range(constants['GRID_SIZE'])] for _ in range(constants['GRID_SIZE'])]
 
-        for index in mutation_indices:
-            row = index // constants['GRID_SIZE']
-            col = index % constants['GRID_SIZE']
-            random_word = random.choice(word)
-            individual[row][col] = random_word.lower()
+            # Calculate the total number of cells in the grid
+            total_slots = constants['GRID_SIZE'] * constants['GRID_SIZE']
 
+            # Calculate the number of cells to mutate based on the mutation rate
+            num_mutations = int(constants['MUTATION_RATE'] * total_slots)
+
+            # Randomly select indices to undergo mutation
+            mutation_indices = random.sample(range(total_slots), num_mutations)
+
+            # Assign random letters to the selected mutation indices
+            for index in mutation_indices:
+                # Calculate the row and column indices for the current index
+                row = index // constants['GRID_SIZE']
+                col = index % constants['GRID_SIZE']
+
+                # Assign a randomly chosen lowercase letter from the 'word' list to the cell
+                random_letter = random.choice(word)
+                individual[row][col] = random_letter.lower()
+
+        # Add the individual to the population
         population.append(individual)
 
     return population
+
